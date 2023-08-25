@@ -1,27 +1,30 @@
 import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import numpy as np
-import seaborn as sns
+from PIL import Image
 
-df= pd.read_excel("hhh.xlsx")
+def main():
+    st.title("Simple Streamlit App with PIL")
+    st.write("Upload an image and perform basic operations using PIL.")
 
-st.title('Scatter Plot App')
+    uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
-# Dropdowns to select x and y columns
-x_column = st.selectbox('Select X Column', df.columns)
-y_column = st.selectbox('Select Y Column', df.columns)
+    if uploaded_image is not None:
+        st.image(uploaded_image, caption="Uploaded Image", use_column_width=True)
+        
+        image = Image.open(uploaded_image)
+        
+        st.subheader("Image Operations")
+        operation = st.selectbox("Select an operation", ("Original", "Rotate", "Resize"))
+        
+        if operation == "Rotate":
+            angle = st.slider("Select rotation angle", -360, 360, 0)
+            rotated_image = image.rotate(angle)
+            st.image(rotated_image, caption="Rotated Image", use_column_width=True)
+        
+        elif operation == "Resize":
+            width = st.slider("Enter new width", 1, 1000, image.width)
+            height = st.slider("Enter new height", 1, 1000, image.height)
+            resized_image = image.resize((width, height))
+            st.image(resized_image, caption="Resized Image", use_column_width=True)
 
-
-plot_button = st.button('PLOT')
-
-# Handle plot button click
-if plot_button:
-    # Create a scatter plot using Seaborn
-    plt.figure(figsize=(8, 6))
-    sns.scatterplot(data=df, x=x_column, y=y_column)
-    plt.xlabel(x_column)
-    plt.ylabel(y_column)
-    plt.title(f'Scatter Plot: {x_column} vs {y_column}')
-    st.pyplot(plt)
+if __name__ == "__main__":
+    main()
